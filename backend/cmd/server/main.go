@@ -37,10 +37,11 @@ func main() {
 	mr := repository.NewMoodRepository(db)
 	ar := repository.NewAssessmentRepository(db)
 	jr := repository.NewJournalRepository(db)
+	tx := repository.NewTxManager(db)
 	us := service.NewUserService(ur, logger)
 	ms := service.NewMoodService(mr, logger)
 	as := service.NewAssessmentService(ar, logger)
-	js := service.NewJournalService(jr, logger)
+	js := service.NewJournalService(jr, mr, tx, logger)
 	if e = as.Seed(); e != nil {
 		logger.Error("assessment seed failed", "error", e)
 		os.Exit(1)

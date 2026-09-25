@@ -21,7 +21,7 @@ type MoodService struct {
 func NewMoodService(r repository.MoodRepository, l *slog.Logger) *MoodService {
 	return &MoodService{r, l}
 }
-func validTags(tags []string) bool {
+func ValidMoodTags(tags []string) bool {
 	allowed := map[string]bool{}
 	for _, v := range constants.MoodTags {
 		allowed[v] = true
@@ -34,7 +34,7 @@ func validTags(tags []string) bool {
 	return true
 }
 func (s *MoodService) Create(uid uint, req dto.MoodRequest) (*model.Mood, error) {
-	if !validTags(req.MoodTags) {
+	if !ValidMoodTags(req.MoodTags) {
 		return nil, util.NewAppError(constants.CodeValidation, "Mood[mood_tags] create failed: unsupported tag", nil)
 	}
 	d, e := time.Parse("2006-01-02", req.RecordDate)
@@ -70,7 +70,7 @@ func (s *MoodService) Update(uid, id uint, req dto.MoodRequest) (*model.Mood, er
 	if e != nil {
 		return nil, fmt.Errorf("Mood[id=%d] fetch failed: %w", id, e)
 	}
-	if !validTags(req.MoodTags) {
+	if !ValidMoodTags(req.MoodTags) {
 		return nil, util.WrapEntity("Mood", "mood_tags", id, constants.CodeValidation, nil)
 	}
 	d, e := time.Parse("2006-01-02", req.RecordDate)
@@ -82,6 +82,8 @@ func (s *MoodService) Update(uid, id uint, req dto.MoodRequest) (*model.Mood, er
 	v.MoodTags = string(b)
 	v.Note = req.Note
 	v.RecordDate = d
+	// 用户手动维护过这条记录后，日记的后续编辑不再覆盖它；关联关系保留以便时间轴展示。
+	v.SyncedFromJournal = false
 	if e = s.repo.Update(v); e != nil {
 		return nil, util.WrapEntity("Mood", "mood_level", id, constants.CodeInternal, e)
 	}

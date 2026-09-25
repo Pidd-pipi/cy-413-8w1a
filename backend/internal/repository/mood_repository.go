@@ -11,8 +11,10 @@ type MoodRepository interface {
 	Create(*model.Mood) error
 	List(uint, *time.Time) ([]model.Mood, error)
 	ByID(uint, uint) (*model.Mood, error)
+	ByJournalID(uint, uint) (*model.Mood, error)
 	Update(*model.Mood) error
 	Delete(*model.Mood) error
+	UnlinkByJournal(uint, uint) error
 }
 type moodRepository struct{ db *gorm.DB }
 
@@ -34,5 +36,20 @@ func (r *moodRepository) ByID(id, uid uint) (*model.Mood, error) {
 	}
 	return &v, e
 }
+func (r *moodRepository) ByJournalID(uid, journalID uint) (*model.Mood, error) {
+	var v model.Mood
+	e := r.db.Where("journal_id = ? AND user_id = ?", journalID, uid).First(&v).Error
+	if errors.Is(e, gorm.ErrRecordNotFound) {
+		return nil, ErrNotFound
+	}
+	return &v, e
+}
 func (r *moodRepository) Update(v *model.Mood) error { return r.db.Save(v).Error }
 func (r *moodRepository) Delete(v *model.Mood) error { return r.db.Delete(v).Error }
+
+// UnlinkByJournal 解除情绪记录与日记的关联，但保留情绪记录本身（日记删除时使用）。
+func (r *moodRepository) UnlinkByJournal(uid, journalID uint) error {
+	return r.db.Model(&model.Mood{}).
+		Where("user_id = ? AND journal_id = ?", uid, journalID).
+		Updates(map[string]any{"journal_id": nil, "synced_from_journal": false}).Error
+}

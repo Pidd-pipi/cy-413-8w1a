@@ -22,7 +22,7 @@ MindGarden 是一款用于温柔记录每日心情、完成轻量自我觉察测
 - **心情花园**：记录 1–10 的心情指数、多个情绪标签和备注，查看最近趋势曲线。
 - **情绪记录**：按日期筛选，保存情绪列表；`MoodSelector` 在 Dashboard 和 Moods 页面共享。
 - **心理测评**：浏览压力/睡眠测评，答题后得到分数、结果和关照建议。
-- **日记本**：写作私密日记，记录天气和心情，并用时间轴回顾；`MoodCard` 同时服务情绪记录和日记页。
+- **日记本**：写作私密日记，记录天气、心情指数和多个情绪标签，并用时间轴回顾；保存新日记时若当天还没有情绪记录，会自动生成一条关联的情绪记录，已有手动记录则原样保留；时间轴上可看出每篇日记的关联状态；`MoodCard` 同时服务情绪记录和日记页。
 - **个人中心**：修改资料、头像链接，查看完成过的测评报告。
 - **JWT + 角色**：写入数据必须携带 JWT；测评创建接口仅允许 `admin` 角色。
 - **主题切换**：晨雾绿、夜间花园、薰衣草三套 CSS 变量主题。
@@ -92,8 +92,8 @@ Vite 会把本地 `/api` 请求重写到 `http://localhost:19413/v1`；Docker �
 | GET | `/api/v1/assessments` | 测评列表 |
 | POST | `/api/v1/assessments/:id/take` | 提交答案与生成结果 |
 | POST | `/api/v1/assessments` | 创建测评（仅 admin） |
-| GET / POST | `/api/v1/journals` | 查询（支持 `mood_level`）/创建日记 |
-| PUT / DELETE | `/api/v1/journals/:id` | 修改/删除日记 |
+| GET / POST | `/api/v1/journals` | 查询（支持 `mood_level`，列表附带关联情绪 `mood`）/创建日记（当天无情绪记录时自动生成一条并关联） |
+| PUT / DELETE | `/api/v1/journals/:id` | 修改日记（只同步本日记自动生成、且未被手动改过的情绪）/删除日记（解除关联但保留情绪） |
 
 更精简的 OpenAPI 描述见 [`backend/api/openapi.yaml`](backend/api/openapi.yaml)。
 

@@ -8,6 +8,7 @@ type Journal struct {
 	Title     string    `gorm:"not null" json:"title"`
 	Content   string    `gorm:"type:text;not null" json:"content"`
 	MoodLevel int       `json:"mood_level"`
+	MoodTags  string    `gorm:"type:text" json:"mood_tags"`
 	Weather   string    `json:"weather"`
 	IsPrivate bool      `gorm:"default:true" json:"is_private"`
 	CreatedAt time.Time `json:"created_at"`
