@@ -40,7 +40,7 @@ func main() {
 	us := service.NewUserService(ur, logger)
 	ms := service.NewMoodService(mr, logger)
 	as := service.NewAssessmentService(ar, logger)
-	js := service.NewJournalService(jr, logger)
+	js := service.NewJournalService(jr, ms, logger)
 	if e = as.Seed(); e != nil {
 		logger.Error("assessment seed failed", "error", e)
 		os.Exit(1)

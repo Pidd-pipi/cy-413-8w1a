@@ -32,9 +32,10 @@ type TakeAssessmentRequest struct {
 	Answers []int `json:"answers" validate:"required,min=1"`
 }
 type JournalRequest struct {
-	Title     string `json:"title" validate:"required,max=120"`
-	Content   string `json:"content" validate:"required,max=5000"`
-	MoodLevel int    `json:"mood_level" validate:"min=1,max=10"`
-	Weather   string `json:"weather" validate:"max=30"`
-	IsPrivate bool   `json:"is_private"`
+	Title     string   `json:"title" validate:"required,max=120"`
+	Content   string   `json:"content" validate:"required,max=5000"`
+	MoodLevel int      `json:"mood_level" validate:"min=0,max=10"`
+	MoodTags  []string `json:"mood_tags" validate:"max=5"`
+	Weather   string   `json:"weather" validate:"max=30"`
+	IsPrivate bool     `json:"is_private"`
 }
